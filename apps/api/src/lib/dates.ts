@@ -1,8 +1,3 @@
-// export function toDate(ms: number | null | undefined): string | null {
-//   if (ms == null) return null;
-//   return new Date(ms).toISOString();
-// }
-
 export function serializeDates<T extends Record<string, unknown>>(
   obj: T,
   fields: (keyof T)[]
