@@ -1,7 +1,33 @@
-# deps
+# dependencies
 node_modules/
 
-# env
+# environment
 .env
-
 .env.local
+.env.*.local
+
+# build
+.next/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+npm-debug.log*
+bun-debug.log*
+
+# testing
+coverage/
+
+# convex
+convex/_generated/

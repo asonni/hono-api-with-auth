@@ -1,0 +1,10 @@
+{
+  "extends": "@packages/typescript-config/base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "strictNullChecks": true
+  },
+  "include": ["convex/**/*"],
+  "exclude": ["node_modules"]
+}
