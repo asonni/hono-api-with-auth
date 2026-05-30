@@ -1,41 +1,36 @@
-import { createMiddleware } from 'hono/factory';
-import { ApiKeyTable, type UserTable } from '../db/schema';
-import { hashApiKey } from '../lib/crypto';
-import { db } from '../db/db';
+import { createMiddleware } from "hono/factory";
+import { anyApi } from "convex/server";
+
+import { convex } from "../lib/convex";
+import { hashApiKey } from "../lib/crypto";
 
 export type ApiKeyEnv = {
   Variables: {
-    apiKeyUser: Pick<typeof UserTable.$inferSelect, 'id' | 'role' | 'email'>;
+    apiKeyUser: { id: string; role: string; email: string };
   };
 };
 
 export const apiKeyAuth = createMiddleware<ApiKeyEnv>(async (c, next) => {
-  const key = c.req.header('X-API-Key');
-  if (key == null || key.trim() === '') {
-    return c.json({ error: 'Missing API Key' }, 401);
+  const key = c.req.header("X-API-Key");
+  if (key == null || key.trim() === "") {
+    return c.json({ error: "Missing API Key" }, 401);
   }
 
   const keyHash = hashApiKey(key);
-  const apiKey = await db.query.ApiKeyTable.findFirst({ where: { keyHash } });
+  const result = await convex.query(anyApi.apiKeys.getByHash, { keyHash });
 
-  if (apiKey == null) {
-    return c.json({ error: 'Invalid API Key' }, 401);
+  if (result == null) {
+    return c.json({ error: "Invalid API Key" }, 401);
   }
 
-  // Check if the API key has expired
-  if (apiKey.expiresAt && new Date(apiKey.expiresAt) < new Date()) {
-    return c.json({ error: 'API Key has expired' }, 401);
+  if (result.expiresAt && result.expiresAt < Date.now()) {
+    return c.json({ error: "API Key has expired" }, 401);
   }
 
-  const user = await db.query.UserTable.findFirst({
-    where: { id: apiKey.userId },
-    columns: { id: true, role: true, email: true }
+  c.set("apiKeyUser", {
+    id: result.user.id,
+    role: result.user.role,
+    email: result.user.email,
   });
-
-  if (user == null) {
-    return c.json({ error: 'Invalid API Key' }, 401);
-  }
-
-  c.set('apiKeyUser', user);
   await next();
 });

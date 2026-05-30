@@ -1,12 +1,12 @@
 import z from 'zod';
 import { Hono } from 'hono';
 import { jwt } from 'hono/jwt';
-import { and, eq } from 'drizzle-orm';
+import { anyApi } from 'convex/server';
 import { sValidator } from '@hono/standard-validator';
 
-import { db } from '../db/db';
+import { convex } from '../lib/convex';
+import { serializeDates } from '../lib/dates';
 import { env } from '../data/env';
-import { ApiKeyTable } from '../db/schema';
 import { generateApiKey } from '../lib/crypto';
 
 type JwtEnv = {
@@ -27,18 +27,11 @@ app.use(jwt({ secret: env.JWT_SECRET, alg: 'HS256' }));
 app.get('/', async c => {
   const { sub: userId } = c.var.jwtPayload;
 
-  const keys = await db.query.ApiKeyTable.findMany({
-    where: { userId },
-    columns: {
-      id: true,
-      name: true,
-      keyPrefix: true,
-      createdAt: true,
-      expiresAt: true
-    }
-  });
+  const keys = await convex.query(anyApi.apiKeys.listByUser, { userId });
 
-  return c.json(keys);
+  return c.json(
+    keys.map((k: Record<string, unknown>) => serializeDates(k, ['createdAt', 'expiresAt']))
+  );
 });
 
 app.post('/', sValidator('json', createKeySchema), async c => {
@@ -46,34 +39,29 @@ app.post('/', sValidator('json', createKeySchema), async c => {
   const { name, expiresAt } = c.req.valid('json');
   const { hash, prefix, raw } = generateApiKey();
 
-  let expiresAtValue: Date | null | undefined = null;
+  let expiresAtValue: number | null | undefined = undefined;
 
   if (typeof expiresAt === 'string') {
     const date = new Date(expiresAt);
-    expiresAtValue = isNaN(date.getTime()) ? null : date;
+    expiresAtValue = isNaN(date.getTime()) ? null : date.getTime();
   }
 
-  const [apiKey] = await db
-    .insert(ApiKeyTable)
-    .values({
-      name,
-      userId,
-      expiresAt: expiresAtValue,
-      keyHash: hash,
-      keyPrefix: prefix
-    })
-    .returning({ id: ApiKeyTable.id });
+  const apiKey = await convex.mutation(anyApi.apiKeys.create, {
+    userId,
+    name,
+    keyHash: hash,
+    keyPrefix: prefix,
+    expiresAt: expiresAtValue
+  });
 
-  return c.json({ key: raw, id: apiKey.id, expiresAt: expiresAtValue }, 201);
+  return c.json({ key: raw, id: apiKey.id }, 201);
 });
 
 app.delete('/:id', async c => {
   const { sub: userId } = c.var.jwtPayload;
   const id = c.req.param('id');
 
-  await db
-    .delete(ApiKeyTable)
-    .where(and(eq(ApiKeyTable.id, id), eq(ApiKeyTable.userId, userId)));
+  await convex.mutation(anyApi.apiKeys.remove, { id, userId });
 
   return c.body(null, 204);
 });
