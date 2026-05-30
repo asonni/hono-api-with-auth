@@ -1,7 +1,7 @@
-export function toDate(ms: number | null | undefined): string | null {
-  if (ms == null) return null;
-  return new Date(ms).toISOString();
-}
+// export function toDate(ms: number | null | undefined): string | null {
+//   if (ms == null) return null;
+//   return new Date(ms).toISOString();
+// }
 
 export function serializeDates<T extends Record<string, unknown>>(
   obj: T,
@@ -11,7 +11,9 @@ export function serializeDates<T extends Record<string, unknown>>(
   for (const field of fields) {
     const value = result[field];
     if (typeof value === 'number') {
-      result[field] = toDate(value) as T[keyof T];
+      result[field] = new Date(
+        value
+      ).toISOString() as unknown as T[typeof field];
     }
   }
   return result;
