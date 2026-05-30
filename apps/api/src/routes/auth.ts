@@ -4,8 +4,8 @@ import { sign } from 'hono/jwt';
 import { anyApi } from 'convex/server';
 import { sValidator } from '@hono/standard-validator';
 
-import { convex } from '../lib/convex.ts';
-import { env } from '../data/env.ts';
+import { convex } from '../lib/convex';
+import { env } from '../data/env';
 
 const JWT_EXPIRATION_SECONDS = 24 * 60 * 60;
 

@@ -3,9 +3,9 @@ import { Hono } from 'hono';
 import { anyApi } from 'convex/server';
 import { sValidator } from '@hono/standard-validator';
 
-import { convex } from '../lib/convex.ts';
-import { serializeDates } from '../lib/dates.ts';
-import { apiKeyAuth, type ApiKeyEnv } from '../middleware/auth.ts';
+import { convex } from '../lib/convex';
+import { serializeDates } from '../lib/dates';
+import { apiKeyAuth, type ApiKeyEnv } from '../middleware/auth';
 
 const app = new Hono();
 

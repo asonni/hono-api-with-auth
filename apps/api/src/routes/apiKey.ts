@@ -4,9 +4,9 @@ import { jwt } from 'hono/jwt';
 import { anyApi } from 'convex/server';
 import { sValidator } from '@hono/standard-validator';
 
-import { convex } from '../lib/convex.ts';
-import { serializeDates } from '../lib/dates.ts';
-import { env } from '../data/env.ts';
+import { convex } from '../lib/convex';
+import { serializeDates } from '../lib/dates';
+import { env } from '../data/env';
 
 type JwtEnv = {
   Variables: {
