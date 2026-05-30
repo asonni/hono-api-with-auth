@@ -1,20 +1,31 @@
-# Hono API with Auth
+# Library Management System
 
-A **Library Management REST API** built with [Hono](https://hono.dev), featuring dual authentication (JWT + API Keys), role-based access control, and interactive OpenAPI documentation.
+A full-stack **Library Management System** built as a monorepo with [Bun workspaces](https://bun.sh/docs/install/workspaces), featuring a Hono REST API, Next.js admin dashboard, and Convex backend. Includes dual authentication (JWT + API Keys), role-based access control, and interactive OpenAPI documentation.
 
 ## Tech Stack
 
+### Core
 - **Runtime:** [Bun](https://bun.sh)
-- **Framework:** [Hono](https://hono.dev) v4.12 — lightweight, fast web framework
+- **Monorepo:** Bun workspaces
 - **Language:** TypeScript
-- **Database:** PostgreSQL (via Docker Compose)
-- **ORM:** [Drizzle ORM](https://orm.drizzle.team) v1.0.0-rc.3 + Drizzle Kit for migrations
+
+### Applications
+- **API Server:** [Hono](https://hono.dev) v4.12 — lightweight, fast web framework
+- **Web Dashboard:** [Next.js](https://nextjs.org) 15 with App Router
+- **Database:** [Convex](https://www.convex.dev) — real-time backend-as-a-service
+
+### Shared Packages
+- **UI Library:** [shadcn/ui](https://ui.shadcn.com) + [Tailwind CSS](https://tailwindcss.com) + [Radix UI](https://www.radix-ui.com)
+- **ESLint Config:** Shared ESLint configurations with Prettier integration
+- **TypeScript Config:** Shared TypeScript configurations
+
+### Libraries
 - **Validation:** [Zod](https://zod.dev) v4.4.3 with `@hono/standard-validator`
 - **Authentication:**
   - JWT (JSON Web Tokens) for user login / registration
   - API Key authentication for resource CRUD operations
 - **Documentation:** Swagger / OpenAPI with `@hono/swagger-ui`
-- **Security:** Custom crypto utilities for password hashing and API key generation
+- **Security:** Convex actions for password hashing and API key generation
 
 ## Features
 
@@ -26,14 +37,53 @@ A **Library Management REST API** built with [Hono](https://hono.dev), featuring
   - **Regular users** can only modify books they created.
 - **Request Validation:** All incoming JSON payloads are validated using Zod schemas.
 - **Auto-generated Docs:** Interactive Swagger UI at `/docs`.
-- **Database Migrations:** Managed with Drizzle Kit.
+- **Real-time Backend:** Convex provides real-time data synchronization and serverless functions.
+- **Admin Dashboard:** Next.js web application for managing the library (work in progress).
+
+## Project Structure
+
+```
+.
+├── apps/
+│   ├── api/                    # Hono REST API server (port 3000)
+│   │   ├── src/
+│   │   │   ├── routes/         # API route handlers
+│   │   │   ├── middleware/     # Authentication middleware
+│   │   │   ├── lib/            # Utilities (Convex client, date formatting)
+│   │   │   └── data/           # Environment validation
+│   │   └── swagger.json        # OpenAPI specification
+│   └── web/                    # Next.js admin dashboard (port 3001)
+│       ├── app/                # App Router pages
+│       └── tailwind.config.ts  # Tailwind configuration
+├── packages/
+│   ├── backend/                # Convex backend
+│   │   └── convex/
+│   │       ├── schema.ts       # Database schema
+│   │       ├── users.ts        # User queries/mutations
+│   │       ├── authors.ts      # Author queries/mutations
+│   │       ├── books.ts        # Book queries/mutations
+│   │       ├── apiKeys.ts      # API key queries/mutations
+│   │       └── crypto.ts       # Crypto actions (password hashing, API key generation)
+│   ├── ui/                     # Shared UI components
+│   │   ├── src/components/     # Button, Card, Input, Label, Badge
+│   │   ├── src/lib/utils.ts    # Utility functions (cn helper)
+│   │   └── tailwind.config.ts  # Shared Tailwind preset
+│   ├── eslint-config/          # Shared ESLint configurations
+│   │   ├── base.js             # Base config
+│   │   ├── next.js             # Next.js config
+│   │   └── hono.js             # Hono/Node config
+│   └── typescript-config/      # Shared TypeScript configurations
+│       ├── base.json           # Base config
+│       └── nextjs.json         # Next.js config
+└── package.json                # Root workspace configuration
+```
 
 ## Getting Started
 
 ### Prerequisites
 
 - [Bun](https://bun.sh) installed
-- Docker & Docker Compose (for PostgreSQL)
+- [Convex](https://www.convex.dev) account (free tier available)
 
 ### 1. Install dependencies
 
@@ -41,39 +91,59 @@ A **Library Management REST API** built with [Hono](https://hono.dev), featuring
 bun install
 ```
 
-### 2. Set up environment variables
+### 2. Set up Convex backend
 
-Create a `.env` file in the project root:
+Navigate to the backend package and start the Convex dev server:
 
+```sh
+cd packages/backend
+bunx convex dev
+```
+
+This will:
+- Prompt you to log in to Convex (if not already logged in)
+- Create a new Convex project or link to an existing one
+- Generate the `_generated` directory with type-safe API clients
+- Provide you with deployment URLs
+
+Copy the `CONVEX_URL` and `CONVEX_DEPLOYMENT` values to the appropriate `.env.local` files.
+
+### 3. Configure environment variables
+
+**apps/api/.env.local:**
 ```env
 PORT=3000
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=library-yt-video
-DB_USER=postgres
-DB_PASSWORD=password
+CONVEX_URL=https://your-deployment.convex.cloud
 JWT_SECRET=your_jwt_secret_key
 ```
 
-### 3. Start the database
-
-```sh
-docker compose up -d
+**apps/web/.env.local:**
+```env
+NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
 ```
 
-### 4. Run database migrations
-
-```sh
-bunx drizzle-kit migrate
+**packages/backend/.env.local:**
+```env
+CONVEX_DEPLOYMENT=dev:your-deployment-name
 ```
 
-### 5. Start the development server
+### 4. Start development servers
+
+Start all services:
 
 ```sh
 bun run dev
 ```
 
-The API will be available at `http://localhost:3000`.
+Or start individual services:
+
+```sh
+bun run dev:api      # API server on port 3000
+bun run dev:web      # Web dashboard on port 3001
+bun run dev:backend  # Convex dev server
+```
+
+The API will be available at `http://localhost:3000` and the web dashboard at `http://localhost:3001`.
 
 ## API Routes
 
@@ -127,39 +197,63 @@ The API will be available at `http://localhost:3000`.
 
 ## Scripts
 
+### Root Scripts
+
 | Script | Description |
 |--------|-------------|
-| `bun run dev` | Start the development server with hot reload |
+| `bun run dev` | Start all development servers (API, Web, Backend) |
+| `bun run dev:api` | Start only the API server |
+| `bun run dev:web` | Start only the web dashboard |
+| `bun run dev:backend` | Start only the Convex dev server |
+| `bun run build` | Build all packages |
+| `bun run lint` | Run ESLint across all packages |
+| `bun run typecheck` | Run TypeScript type checking across all packages |
 
-## Project Structure
+### Package-Specific Scripts
 
+Each package also has its own scripts. Navigate to a package directory to run them:
+
+```sh
+cd apps/api
+bun run dev        # Start API server with hot reload
+bun run lint       # Lint API code
+bun run typecheck  # Type check API code
+
+cd apps/web
+bun run dev        # Start Next.js dev server
+bun run build      # Build Next.js for production
+bun run lint       # Lint web code
+bun run typecheck  # Type check web code
+
+cd packages/backend
+bun run dev        # Start Convex dev server
+bun run lint       # Lint backend code
+bun run typecheck  # Type check backend code
 ```
-.
-├── src/
-│   ├── index.ts              # App entry point & route mounting
-│   ├── routes/
-│   │   ├── auth.ts           # JWT login/register
-│   │   ├── apiKey.ts         # API key management
-│   │   ├── author.ts         # Author CRUD
-│   │   ├── book.ts           # Book CRUD
-│   │   └── swagger.ts        # Swagger UI route
-│   ├── middleware/
-│   │   └── auth.ts           # API key verification middleware
-│   ├── db/
-│   │   ├── db.ts             # Drizzle ORM instance
-│   │   ├── schema.ts         # Schema exports
-│   │   ├── relations.ts      # Table relations
-│   │   ├── schemas/          # Individual table schemas
-│   │   └── migrations/       # Drizzle migrations
-│   ├── lib/
-│   │   └── crypto.ts         # Password & API key hashing utilities
-│   └── data/
-│       └── env.ts            # Environment variable validation (Zod)
-├── drizzle.config.ts         # Drizzle Kit configuration
-├── docker-compose.yml        # PostgreSQL container setup
-├── swagger.json              # OpenAPI specification
-└── package.json
-```
+
+## Architecture
+
+### Data Flow
+
+1. **Web Dashboard** (`apps/web`) communicates directly with **Convex Backend** (`packages/backend`) using Convex React hooks for real-time data
+2. **API Server** (`apps/api`) handles authentication and calls **Convex Backend** via HTTP client for server-side operations
+3. **Crypto operations** (password hashing, API key generation) run as Convex actions in the backend package
+
+### Shared Packages
+
+- **`@packages/ui`**: Reusable React components with Tailwind CSS styling. Import components like:
+  ```tsx
+  import { Button, Card, Input } from "@packages/ui";
+  ```
+
+- **`@packages/backend`**: Convex schema and functions. Import types like:
+  ```tsx
+  import type { Id } from "@packages/backend/api";
+  ```
+
+- **`@packages/eslint-config`**: Shared ESLint configurations for consistent code quality
+
+- **`@packages/typescript-config`**: Shared TypeScript configurations for consistent type checking
 
 ## License
 
