@@ -1,6 +1,6 @@
 export function toDate(
   ms: number | undefined | null
-): string | null | undefined {
+): string | number | null | undefined {
   if (ms == null) return null;
   return new Date(ms).toISOString();
 }
