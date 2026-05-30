@@ -10,7 +10,7 @@ swagger.get(
   swaggerUI({
     url: '/swagger.json',
     title: 'API Docs',
-    spec: swaggerDocument
+    spec: swaggerDocument,
   })
 );
 

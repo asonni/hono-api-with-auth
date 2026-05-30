@@ -1,12 +1,12 @@
-import z from "zod";
-import { Hono } from "hono";
-import { jwt } from "hono/jwt";
-import { anyApi } from "convex/server";
-import { sValidator } from "@hono/standard-validator";
+import z from 'zod';
+import { Hono } from 'hono';
+import { jwt } from 'hono/jwt';
+import { anyApi } from 'convex/server';
+import { sValidator } from '@hono/standard-validator';
 
-import { convex } from "../lib/convex";
-import { serializeDates } from "../lib/dates";
-import { env } from "../data/env";
+import { convex } from '../lib/convex';
+import { serializeDates } from '../lib/dates';
+import { env } from '../data/env';
 
 type JwtEnv = {
   Variables: {
@@ -21,23 +21,23 @@ const createKeySchema = z.object({
   expiresAt: z.string().optional(),
 });
 
-app.use(jwt({ secret: env.JWT_SECRET, alg: "HS256" }));
+app.use(jwt({ secret: env.JWT_SECRET, alg: 'HS256' }));
 
-app.get("/", async (c) => {
+app.get('/', async (c) => {
   const { sub: userId } = c.var.jwtPayload;
 
   const keys = await convex.query(anyApi.apiKeys.listByUser, { userId });
 
   return c.json(
     keys.map((k: Record<string, unknown>) =>
-      serializeDates(k, ["createdAt", "expiresAt"])
+      serializeDates(k, ['createdAt', 'expiresAt'])
     )
   );
 });
 
-app.post("/", sValidator("json", createKeySchema), async (c) => {
+app.post('/', sValidator('json', createKeySchema), async (c) => {
   const { sub: userId } = c.var.jwtPayload;
-  const { name, expiresAt } = c.req.valid("json");
+  const { name, expiresAt } = c.req.valid('json');
   const { raw, hash, prefix } = await convex.action(
     anyApi.crypto.generateApiKey,
     {}
@@ -45,7 +45,7 @@ app.post("/", sValidator("json", createKeySchema), async (c) => {
 
   let expiresAtValue: number | null | undefined = undefined;
 
-  if (typeof expiresAt === "string") {
+  if (typeof expiresAt === 'string') {
     const date = new Date(expiresAt);
     expiresAtValue = isNaN(date.getTime()) ? null : date.getTime();
   }
@@ -61,9 +61,9 @@ app.post("/", sValidator("json", createKeySchema), async (c) => {
   return c.json({ key: raw, id: apiKey.id }, 201);
 });
 
-app.delete("/:id", async (c) => {
+app.delete('/:id', async (c) => {
   const { sub: userId } = c.var.jwtPayload;
-  const id = c.req.param("id");
+  const id = c.req.param('id');
 
   await convex.mutation(anyApi.apiKeys.remove, { id, userId });
 
