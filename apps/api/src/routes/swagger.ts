@@ -1,7 +1,14 @@
+import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Hono } from 'hono';
 import { swaggerUI } from '@hono/swagger-ui';
 
-import swaggerDocument from '../../swagger.json' with { type: 'json' };
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const swaggerDocument = JSON.parse(
+  readFileSync(join(__dirname, '../../swagger.json'), 'utf-8')
+);
 
 const swagger = new Hono();
 
