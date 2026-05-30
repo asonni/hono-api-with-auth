@@ -1,6 +1,4 @@
-export function toDate(
-  ms: number | undefined | null
-): string | number | null | undefined {
+export function toDate(ms: number | null | undefined): string | null {
   if (ms == null) return null;
   return new Date(ms).toISOString();
 }
