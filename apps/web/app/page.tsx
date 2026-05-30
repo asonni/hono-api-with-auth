@@ -1,26 +1,19 @@
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@packages/ui";
+import { Button } from "@workspace/ui/components/button"
 
-export default function Home() {
+export default function Page() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Library Management Dashboard</CardTitle>
-          <CardDescription>
-            Welcome to the admin dashboard. Manage authors, books, and API keys.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <p className="text-sm text-muted-foreground">
-            This dashboard is under construction. Check back soon for full functionality.
-          </p>
-          <div className="flex gap-2">
-            <Button>Manage Authors</Button>
-            <Button variant="outline">Manage Books</Button>
-            <Button variant="secondary">API Keys</Button>
-          </div>
-        </CardContent>
-      </Card>
-    </main>
-  );
+    <div className="flex min-h-svh p-6">
+      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
+        <div>
+          <h1 className="font-medium">Project ready!</h1>
+          <p>You may now add components and start building.</p>
+          <p>We&apos;ve already added the button component for you.</p>
+          <Button className="mt-2">Button</Button>
+        </div>
+        <div className="text-muted-foreground font-mono text-xs">
+          (Press <kbd>d</kbd> to toggle dark mode)
+        </div>
+      </div>
+    </div>
+  )
 }

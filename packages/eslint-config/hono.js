@@ -1,6 +1,6 @@
-import baseConfig from "./base.js";
+import { config as baseConfig } from "./base.js";
 
-export default [
+export const config = [
   ...baseConfig,
   {
     files: ["**/*.ts"],

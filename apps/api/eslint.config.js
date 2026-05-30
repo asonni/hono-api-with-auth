@@ -1,3 +1,3 @@
-import config from "@packages/eslint-config/hono.js";
+import { config } from "@workspace/eslint-config/hono";
 
 export default config;

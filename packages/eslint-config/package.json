@@ -1,20 +1,30 @@
 {
-  "name": "@packages/eslint-config",
+  "name": "@workspace/eslint-config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./base": "./base.js",
+    "./next-js": "./next-js.js",
+    "./hono": "./hono.js",
+    "./react-internal": "./react-internal.js"
+  },
   "files": [
     "base.js",
-    "next.js",
-    "hono.js"
+    "next-js.js",
+    "hono.js",
+    "react-internal.js"
   ],
   "dependencies": {
+    "@eslint/js": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.0",
     "@next/eslint-plugin-next": "^15.0.0",
     "eslint-plugin-react": "^7.35.0",
-    "eslint-plugin-react-hooks": "^5.0.0"
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "globals": "^15.0.0",
+    "typescript-eslint": "^8.0.0"
   }
 }

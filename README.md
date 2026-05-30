@@ -11,13 +11,13 @@ A full-stack **Library Management System** built as a monorepo with [Bun workspa
 
 ### Applications
 - **API Server:** [Hono](https://hono.dev) v4.12 — lightweight, fast web framework
-- **Web Dashboard:** [Next.js](https://nextjs.org) 15 with App Router
+- **Web Dashboard:** [Next.js](https://nextjs.org) 16 with App Router, dark mode support via `next-themes`
 - **Database:** [Convex](https://www.convex.dev) — real-time backend-as-a-service
 
 ### Shared Packages
-- **UI Library:** [shadcn/ui](https://ui.shadcn.com) + [Tailwind CSS](https://tailwindcss.com) + [Radix UI](https://www.radix-ui.com)
-- **ESLint Config:** Shared ESLint configurations with Prettier integration
-- **TypeScript Config:** Shared TypeScript configurations
+- **UI Library:** [shadcn/ui](https://ui.shadcn.com) v4 (`radix-nova` style) + [Tailwind CSS](https://tailwindcss.com) v4 + [Radix UI](https://www.radix-ui.com) — 55+ components
+- **ESLint Config:** Shared ESLint configurations (base, Next.js, Hono, React) with Prettier integration
+- **TypeScript Config:** Shared TypeScript configurations (base, Next.js, React library)
 
 ### Libraries
 - **Validation:** [Zod](https://zod.dev) v4.4.3 with `@hono/standard-validator`
@@ -38,25 +38,27 @@ A full-stack **Library Management System** built as a monorepo with [Bun workspa
 - **Request Validation:** All incoming JSON payloads are validated using Zod schemas.
 - **Auto-generated Docs:** Interactive Swagger UI at `/docs`.
 - **Real-time Backend:** Convex provides real-time data synchronization and serverless functions.
-- **Admin Dashboard:** Next.js web application for managing the library (work in progress).
+- **Admin Dashboard:** Next.js web application with dark mode support for managing the library (work in progress).
 
 ## Project Structure
 
 ```
 .
 ├── apps/
-│   ├── api/                    # Hono REST API server (port 3000)
+│   ├── api/                    # Hono REST API server (@apps/api)
 │   │   ├── src/
 │   │   │   ├── routes/         # API route handlers
 │   │   │   ├── middleware/     # Authentication middleware
 │   │   │   ├── lib/            # Utilities (Convex client, date formatting)
 │   │   │   └── data/           # Environment validation
 │   │   └── swagger.json        # OpenAPI specification
-│   └── web/                    # Next.js admin dashboard (port 3001)
-│       ├── app/                # App Router pages
-│       └── tailwind.config.ts  # Tailwind configuration
+│   └── web/                    # Next.js admin dashboard (web)
+│       ├── app/                # App Router pages (layout, page)
+│       ├── components/         # App-specific components (theme-provider)
+│       ├── hooks/              # App-specific hooks (use-mobile)
+│       └── lib/                # App-specific utilities
 ├── packages/
-│   ├── backend/                # Convex backend
+│   ├── backend/                # Convex backend (@workspace/backend)
 │   │   └── convex/
 │   │       ├── schema.ts       # Database schema
 │   │       ├── users.ts        # User queries/mutations
@@ -64,17 +66,22 @@ A full-stack **Library Management System** built as a monorepo with [Bun workspa
 │   │       ├── books.ts        # Book queries/mutations
 │   │       ├── apiKeys.ts      # API key queries/mutations
 │   │       └── crypto.ts       # Crypto actions (password hashing, API key generation)
-│   ├── ui/                     # Shared UI components
-│   │   ├── src/components/     # Button, Card, Input, Label, Badge
-│   │   ├── src/lib/utils.ts    # Utility functions (cn helper)
-│   │   └── tailwind.config.ts  # Shared Tailwind preset
-│   ├── eslint-config/          # Shared ESLint configurations
-│   │   ├── base.js             # Base config
-│   │   ├── next.js             # Next.js config
+│   ├── ui/                     # Shared UI components (@workspace/ui)
+│   │   ├── src/
+│   │   │   ├── components/     # 55+ shadcn/ui components (radix-nova style)
+│   │   │   ├── hooks/          # Shared hooks (use-mobile)
+│   │   │   ├── lib/            # Utility functions (cn helper)
+│   │   │   └── styles/         # Global CSS with Tailwind v4 theme
+│   │   └── components.json     # shadcn/ui configuration
+│   ├── eslint-config/          # Shared ESLint configurations (@workspace/eslint-config)
+│   │   ├── base.js             # Base TypeScript config
+│   │   ├── next-js.js          # Next.js + React config
+│   │   ├── react-internal.js   # React library config
 │   │   └── hono.js             # Hono/Node config
-│   └── typescript-config/      # Shared TypeScript configurations
+│   └── typescript-config/      # Shared TypeScript configurations (@workspace/typescript-config)
 │       ├── base.json           # Base config
-│       └── nextjs.json         # Next.js config
+│       ├── nextjs.json         # Next.js config
+│       └── react-library.json  # React library config
 └── package.json                # Root workspace configuration
 ```
 
@@ -138,12 +145,12 @@ bun run dev
 Or start individual services:
 
 ```sh
-bun run dev:api      # API server on port 3000
-bun run dev:web      # Web dashboard on port 3001
+bun run dev:api      # API server
+bun run dev:web      # Web dashboard
 bun run dev:backend  # Convex dev server
 ```
 
-The API will be available at `http://localhost:3000` and the web dashboard at `http://localhost:3001`.
+The API will be available at `http://localhost:3000`. The web dashboard runs on the next available port (default `http://localhost:3001`).
 
 ## API Routes
 
@@ -241,19 +248,21 @@ bun run typecheck  # Type check backend code
 
 ### Shared Packages
 
-- **`@packages/ui`**: Reusable React components with Tailwind CSS styling. Import components like:
+- **`@workspace/ui`**: Reusable React components built with shadcn/ui v4 (radix-nova style) and Tailwind CSS v4. Import components like:
   ```tsx
-  import { Button, Card, Input } from "@packages/ui";
+  import { Button } from "@workspace/ui/components/button"
+  import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card"
+  import { cn } from "@workspace/ui/lib/utils"
   ```
 
-- **`@packages/backend`**: Convex schema and functions. Import types like:
+- **`@workspace/backend`**: Convex schema and functions. Import types like:
   ```tsx
-  import type { Id } from "@packages/backend/api";
+  import type { Id } from "@workspace/backend/api"
   ```
 
-- **`@packages/eslint-config`**: Shared ESLint configurations for consistent code quality
+- **`@workspace/eslint-config`**: Shared ESLint configurations for consistent code quality (base, Next.js, Hono, React)
 
-- **`@packages/typescript-config`**: Shared TypeScript configurations for consistent type checking
+- **`@workspace/typescript-config`**: Shared TypeScript configurations for consistent type checking (base, Next.js, React library)
 
 ## License
 

@@ -1,52 +1,33 @@
-import tseslint from "@typescript-eslint/eslint-plugin";
-import tsparser from "@typescript-eslint/parser";
-import prettier from "eslint-config-prettier";
-import importPlugin from "eslint-plugin-import";
+import js from "@eslint/js";
+import eslintConfigPrettier from "eslint-config-prettier";
+import globals from "globals";
+import tseslint from "typescript-eslint";
 
-export default [
+/**
+ * A custom ESLint configuration for libraries that use TypeScript.
+ *
+ * @type {import("eslint").Linter.Config} */
+export const config = [
+  js.configs.recommended,
+  eslintConfigPrettier,
+  ...tseslint.configs.recommended,
   {
-    ignores: ["node_modules/**", "dist/**", ".next/**", "_generated/**"],
-  },
-  {
-    files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
-      parser: tsparser,
-      parserOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
+      globals: {
+        ...globals.node,
       },
     },
-    plugins: {
-      "@typescript-eslint": tseslint,
-      import: importPlugin,
-    },
+  },
+  {
     rules: {
-      ...tseslint.configs.recommended.rules,
-      ...importPlugin.configs.recommended.rules,
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
       "@typescript-eslint/no-explicit-any": "warn",
-      "import/order": [
-        "error",
-        {
-          groups: [
-            "builtin",
-            "external",
-            "internal",
-            "parent",
-            "sibling",
-            "index",
-          ],
-          "newlines-between": "always",
-        },
-      ],
-      "import/no-unresolved": "off",
-      "import/namespace": "off",
-      "import/named": "off",
-      "import/no-duplicates": "off",
     },
   },
-  prettier,
+  {
+    ignores: ["node_modules/**", "dist/**", ".next/**", "_generated/**"],
+  },
 ];

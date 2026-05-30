@@ -1,3 +1,5 @@
+"use node";
+
 import { createHash, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 
 import { v } from "convex/values";

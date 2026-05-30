@@ -1,5 +1,5 @@
 {
-  "name": "@packages/backend",
+  "name": "@workspace/backend",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,8 +15,8 @@
     "convex": "^1.39.1"
   },
   "devDependencies": {
-    "@packages/eslint-config": "workspace:*",
-    "@packages/typescript-config": "workspace:*",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   }

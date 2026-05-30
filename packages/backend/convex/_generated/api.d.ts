@@ -11,6 +11,7 @@
 import type * as apiKeys from "../apiKeys.js";
 import type * as authors from "../authors.js";
 import type * as books from "../books.js";
+import type * as crypto from "../crypto.js";
 import type * as users from "../users.js";
 
 import type {
@@ -23,6 +24,7 @@ declare const fullApi: ApiFromModules<{
   apiKeys: typeof apiKeys;
   authors: typeof authors;
   books: typeof books;
+  crypto: typeof crypto;
   users: typeof users;
 }>;
 

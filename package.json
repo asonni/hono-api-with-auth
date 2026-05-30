@@ -8,8 +8,8 @@
   "scripts": {
     "dev": "bun run --filter '*' dev",
     "dev:api": "bun run --filter @apps/api dev",
-    "dev:web": "bun run --filter @apps/web dev",
-    "dev:backend": "bun run --filter @packages/backend dev",
+    "dev:web": "bun run --filter web dev",
+    "dev:backend": "bun run --filter @workspace/backend dev",
     "build": "bun run --filter '*' build",
     "lint": "bun run --filter '*' lint",
     "typecheck": "bun run --filter '*' typecheck"

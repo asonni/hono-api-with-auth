@@ -1,24 +1,30 @@
-import "@packages/ui/globals.css";
+import { Geist, Geist_Mono } from "next/font/google"
 
-import type { Metadata } from "next";
+import "@workspace/ui/globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
+import { cn } from "@workspace/ui/lib/utils";
 
-import { Providers } from "./providers";
+const geist = Geist({subsets:['latin'],variable:'--font-sans'})
 
-export const metadata: Metadata = {
-  title: "Library Management Dashboard",
-  description: "Admin dashboard for library management",
-};
+const fontMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+})
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={cn("antialiased", fontMono.variable, "font-sans", geist.variable)}
+    >
       <body>
-        <Providers>{children}</Providers>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
-  );
+  )
 }
