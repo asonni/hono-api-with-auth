@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
 
-import authorRoutes from './routes/author';
-import authRoutes from './routes/auth';
-import apiKeyRoutes from './routes/apiKey';
-import bookRoutes from './routes/book';
-import swaggerRoute from './routes/swagger';
+import authorRoutes from './routes/author.ts';
+import authRoutes from './routes/auth.ts';
+import apiKeyRoutes from './routes/apiKey.ts';
+import bookRoutes from './routes/book.ts';
+import swaggerRoute from './routes/swagger.ts';
 
 const app = new Hono();
 
