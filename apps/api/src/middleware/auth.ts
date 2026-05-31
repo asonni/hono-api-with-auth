@@ -1,7 +1,7 @@
 import { createMiddleware } from 'hono/factory';
 import { anyApi } from 'convex/server';
 
-import { convex } from '../lib/convex';
+import { convex } from '../lib/convex.js';
 
 export type ApiKeyEnv = {
   Variables: {
