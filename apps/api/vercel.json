@@ -1,4 +1,6 @@
 {
   "framework": "hono",
-  "bunVersion": "1.x"
+  "bunVersion": "1.x",
+  "buildCommand": "cd ../.. && bun install && cd apps/api",
+  "installCommand": "cd ../.. && bun install"
 }
