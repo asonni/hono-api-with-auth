@@ -1,5 +1,4 @@
 {
   "framework": "hono",
-  "bunVersion": "1.x",
-  "installCommand": "cd ../.. && bun install"
+  "bunVersion": "1.x"
 }
