@@ -7,10 +7,17 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(1),
 });
 
-const parsed = envSchema.safeParse(process.env);
+let _env: z.infer<typeof envSchema> | null = null;
 
-if (!parsed.success) {
-  throw new Error(`Invalid env: ${parsed.error.message}`);
-}
-
-export const env = parsed.data;
+export const env = new Proxy({} as z.infer<typeof envSchema>, {
+  get(_, prop) {
+    if (_env === null) {
+      const parsed = envSchema.safeParse(process.env);
+      if (!parsed.success) {
+        throw new Error(`Invalid env: ${parsed.error.message}`);
+      }
+      _env = parsed.data;
+    }
+    return _env[prop as keyof typeof _env];
+  },
+});
