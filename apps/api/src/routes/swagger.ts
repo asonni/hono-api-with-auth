@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { swaggerUI } from '@hono/swagger-ui';
-import swaggerDocument from '../../swagger.json';
+import swaggerDocument from '../../swagger.json' with { type: 'json' };
 
 const swagger = new Hono();
 
