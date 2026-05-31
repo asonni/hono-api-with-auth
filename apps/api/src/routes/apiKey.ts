@@ -21,7 +21,13 @@ const createKeySchema = z.object({
   expiresAt: z.string().optional(),
 });
 
-app.use(jwt({ secret: env.JWT_SECRET, alg: 'HS256' }));
+let _jwtMiddleware: ReturnType<typeof jwt> | null = null;
+app.use(async (c, next) => {
+  if (_jwtMiddleware === null) {
+    _jwtMiddleware = jwt({ secret: env.JWT_SECRET, alg: 'HS256' });
+  }
+  return _jwtMiddleware(c, next);
+});
 
 app.get('/', async (c) => {
   const { sub: userId } = c.var.jwtPayload;
